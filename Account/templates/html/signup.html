@@ -1,0 +1,234 @@
+{% extends "reusables/base_template.html" %}
+{% load static %}
+
+{% block title %}Sign Up{% endblock title %}
+{% block extra_description %}Create your free {{ project_name }} account and start chatting in seconds.{% endblock extra_description %}
+{% block keywords %}httpchat signup, create account, chat app registration{% endblock keywords %}
+{% block canonical %}signup/{% endblock canonical %}
+{% block og_title %}Create your {{ project_name }} account{% endblock og_title %}
+{% block og_description %}Sign up for {{ project_name }} — simple, fast messaging.{% endblock og_description %}
+{% block og_url %}signup/{% endblock og_url %}
+{% block body_class %}signup-page{% endblock body_class %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/signup.css' %}">
+{% endblock extra_css %}
+
+{% block body_content %}
+<div class="signup-screen">
+    <!-- Brand panel: shown side-by-side on desktop, stacked above the form on mobile -->
+    <aside class="signup-brand">
+        <div class="signup-brand__logo-wrap">
+            <img src="{% static "img/httpchat_logo.png" %}" alt="{{ project_name }} logo" width="272" height="104" decoding="async">
+        </div>
+        <h1>Simple. Secure. Reliable messaging.</h1>
+        <p>{{ project_description }}</p>
+        <ul class="signup-brand__list">
+            <li><span class="signup-brand__bullet" aria-hidden="true"></span> Free to join</li>
+            <li><span class="signup-brand__bullet" aria-hidden="true"></span> Your data stays yours</li>
+            <li><span class="signup-brand__bullet" aria-hidden="true"></span> Chat from any device</li>
+        </ul>
+    </aside>
+
+    <section class="signup-form-panel">
+        <div class="signup-card">
+            <div class="card">
+
+                <div class="signup-card__header">
+                    <h2>Create Account</h2>
+                    <p>It only takes a minute to get started</p>
+                </div>
+
+                <!-- General, top-of-form error summary. Hidden by default; JS
+                     populates + reveals it when submit is blocked by
+                     validation, and moves focus here for a11y. -->
+                <div class="alert alert-error" id="signup-error-summary" role="alert" hidden></div>
+
+                <form id="signup-form" method="post" action="{% url 'account_signup' %}" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Email -->
+                    <div class="field">
+                        <label for="id_email">Email address</label>
+                        <input
+                            class="field-input"
+                            type="email"
+                            id="id_email"
+                            name="email"
+                            placeholder="you@example.com"
+                            autocomplete="email"
+                            required>
+                        <span class="field-error" id="email-error"></span>
+                    </div>
+
+                    <!-- Username -->
+                    <div class="field">
+                        <label for="id_username">Username</label>
+                        {% comment %}
+                            "Check availability" is a manual, button-triggered
+                            check (not on every keystroke) so we don't spam the
+                            backend. It POSTs the typed username + the email
+                            above (see signup.js) so the backend can suggest an
+                            alternative if the username is already taken.
+                            TODO(backend): endpoint is a placeholder for now —
+                            see USERNAME_CHECK_ENDPOINT in signup.js.
+                        {% endcomment %}
+                        <div class="username-check-row">
+                            <input
+                                class="field-input"
+                                type="text"
+                                id="id_username"
+                                name="username"
+                                placeholder="Choose a unique username"
+                                autocomplete="username"
+                                minlength="3"
+                                maxlength="100"
+                                required>
+                            <button type="button" class="btn btn-text username-check-btn" id="check-username-btn">
+                                Check availability
+                            </button>
+                        </div>
+                        <span class="field-hint">
+                            We only use this to check the username is free. Filling in your email
+                            above first is recommended (not required), it lets us suggest a more
+                            personalized alternative if this username is already taken. Nothing is
+                            saved until you submit the form.
+                        </span>
+                        <span class="field-error" id="username-error"></span>
+                        <div class="username-status" id="username-status" data-state="" aria-live="polite"></div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="field">
+                        <label for="id_password">Password</label>
+                        <div class="input-group">
+                            <input
+                                class="field-input"
+                                type="password"
+                                id="id_password"
+                                name="password"
+                                placeholder="At least 8 characters"
+                                autocomplete="new-password"
+                                minlength="8"
+                                required>
+                            <button type="button" class="input-group-btn" data-toggle-password data-target="#id_password" aria-pressed="false">Show</button>
+                        </div>
+                        <div class="password-strength" aria-hidden="true">
+                            <span class="password-strength__bar"></span>
+                            <span class="password-strength__bar"></span>
+                            <span class="password-strength__bar"></span>
+                            <span class="password-strength__bar"></span>
+                            <span class="password-strength__bar"></span>
+                        </div>
+                        <div class="password-strength__label" id="password-strength-label"></div>
+                        <span class="field-error" id="password-error"></span>
+                    </div>
+
+                    <!-- Confirm password -->
+                    <div class="field">
+                        <label for="id_password_confirm">Confirm password</label>
+                        <div class="input-group">
+                            <input
+                                class="field-input"
+                                type="password"
+                                id="id_password_confirm"
+                                name="password_confirm"
+                                placeholder="Re-enter your password"
+                                autocomplete="new-password"
+                                required>
+                            <button type="button" class="input-group-btn" data-toggle-password data-target="#id_password_confirm" aria-pressed="false">Show</button>
+                        </div>
+                        <span class="field-error" id="confirm-error"></span>
+                    </div>
+
+                    <!-- Security questions (fallback recovery instead of email) -->
+
+                    <div class="field">
+                        <label for="id_secret_question">Security questions</label>
+                        <select class="field-input" id="id_secret_question" name="secret_question" required>
+                            <option value="" disabled selected>Choose a set of security questions</option>
+                            {% for question_set in security_questions %}
+                            <option value="{{ question_set }}">Question set {{ forloop.counter }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="field-hint">
+                            Used only to verify it's you if you ever lose access to your account and
+                            email recovery isn't available. We never use these answers for anything else.
+                        </span>
+
+                        <ol class="security-questions-preview" id="security-questions-preview" hidden></ol>
+                        <span class="field-error" id="secret-question-error"></span>
+                    </div>
+
+                    <!-- Secret answers: one dedicated box per question in the
+                         chosen set above, instead of one free-text field the
+                         user has to space-separate correctly. Boxes are
+                         disabled until a question set is picked, and their
+                         placeholders are filled in with the actual question
+                         text by signup.js so it's obvious which box answers
+                         which question. -->
+                    <div class="field">
+                        <label id="secret-answers-label">Your answers</label>
+                        <div class="security-answers-row" role="group" aria-labelledby="secret-answers-label">
+                            <input
+                                class="field-input security-answer-input"
+                                type="text"
+                                id="id_secret_answer_1"
+                                name="secret_answer_1"
+                                placeholder="Answer 1"
+                                maxlength="150"
+                                disabled
+                                required>
+                            <input
+                                class="field-input security-answer-input"
+                                type="text"
+                                id="id_secret_answer_2"
+                                name="secret_answer_2"
+                                placeholder="Answer 2"
+                                maxlength="150"
+                                disabled
+                                required>
+                            <input
+                                class="field-input security-answer-input"
+                                type="text"
+                                id="id_secret_answer_3"
+                                name="secret_answer_3"
+                                placeholder="Answer 3"
+                                maxlength="150"
+                                disabled
+                                required>
+                        </div>
+                        <span class="field-hint">
+                            Answer each question in its own box, in order. Answers are
+                            case-sensitive, so type them exactly how you'll remember them.
+                        </span>
+                        <span class="field-error" id="answer-error"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="signup-submit">
+                        Sign Up
+                    </button>
+
+                    <p class="signup-terms">
+                        By signing up you agree to {{ project_name }}'s Terms of Service and Privacy Policy.
+                    </p>
+                </form>
+
+                <p class="signup-card__footer">
+                    Already have an account? <a href="#">Log in</a>
+                </p>
+
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock body_content %}
+
+{% block footer_content %}
+<a href = "#">Staff Signup </a>
+{% endblock footer_content %}
+
+{% block extra_js %}
+<script src="{% static 'js/signup.js' %}" defer></script>
+{% endblock extra_js%}

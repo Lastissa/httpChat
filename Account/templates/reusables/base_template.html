@@ -1,0 +1,81 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en" data-theme="{% if request.COOKIES.theme == 'dark' %}dark{% else %}light{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>{% block title %}{% endblock title %} | {{ project_name }}</title>
+    <meta name="description" content="{% block extra_description %}{{ project_description }}{% endblock extra_description %}">
+    <meta name="keywords" content="{% block keywords %}httpchat, chat app, real-time messaging, online chat{% endblock keywords %}">
+    <meta name="robots" content="{% block robots_content %}index, follow{% endblock robots_content %}">
+    <meta name="author" content="{{ project_name }}">
+    <link rel="canonical" href="{{ project_base_url }}{% block canonical %}{% endblock canonical %}">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:site_name" content="{{ project_name }}">
+    <meta property="og:type" content="{% block og_type %}website{% endblock og_type %}">
+    <meta property="og:title" content="{% block og_title %}{{ project_name }}{% endblock og_title %}">
+    <meta property="og:description" content="{% block og_description %}{{ project_description }}{% endblock og_description %}">
+    <meta property="og:url" content="{{ project_base_url }}{% block og_url %}{% endblock og_url %}">
+    <meta property="og:image" content="{% block og_image %}{% static 'images/og-default.png' %}{% endblock og_image %}">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ project_name }}{% endblock twitter_title %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ project_description }}{% endblock twitter_description %}">
+
+    <meta name="theme-color" content="{% block theme_color %}#075E54{% endblock theme_color %}">
+    <link rel="icon" type="image/png" href="{% block favicon %}{% static 'img/httpchat_logo.png' %}{% endblock favicon %}">
+
+
+    <link rel="stylesheet" href="{% static 'base_template.css' %}">
+
+    {% block extra_css %}
+    {% comment %} Page-specific stylesheets go here, e.g.{% endcomment %}
+    {% endblock extra_css %}
+
+    {% block extra_head %}
+    {% comment %} Any extra tags a page needs (structured data, preloads, etc.) {% endcomment %}
+    {% endblock extra_head %}
+</head>
+<body class="{% block body_class %}{% endblock body_class %}">
+
+    {% block nav %}{% include "reusables/nav.html" %}{% endblock nav %}
+    {% comment %}
+        Persistent nav, on by default: any page inherits it just by
+        extending this template overite it by giving empty div.
+    {% endcomment %}
+
+    {% if messages %}
+
+    <div class="site-messages container" role="status" aria-live="polite">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-error{% endif %}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main>
+        {% block body_content %}
+        <h1>Main Body Content; Nothing Here</h1>
+        {% endblock body_content %}
+    </main>
+
+    <footer>
+        &copy; {% now "Y" %} {{ project_name }}. All rights reserved.
+        {% block footer_content %}
+        {% endblock footer_content %}
+    </footer>
+
+
+    <div class="toast-region" id="toast-region" role="status" aria-live="polite"></div>
+
+    <!-- Shared site-wide JS (CSRF fetch helper, toasts, theme + nav, password toggles, etc.) -->
+    <script src="{% static 'base_template.js' %}" defer></script>
+
+    {% block extra_js %}
+    {% endblock extra_js %}
+</body>
+</html>

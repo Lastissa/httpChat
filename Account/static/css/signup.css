@@ -1,0 +1,192 @@
+/* =========================================================
+   signup.css
+   ================= */
+
+.signup-screen{
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--color-surface-page);
+}
+
+/* ---------------- Left brand panel (hidden on small screens) ---------------- */
+.signup-brand{
+    flex: 1 1 45%;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-7);
+    background: linear-gradient(160deg, var(--color-brand-primary-dark) 0%, var(--color-brand-primary) 100%);
+    color: var(--color-text-on-brand);
+}
+
+
+.signup-brand h1{
+    color: var(--color-text-on-brand);
+    font-size: var(--fs-xxl);
+    max-width: 20ch;
+}
+
+.signup-brand p{
+    color: rgba(255,255,255,0.85);
+    max-width: 40ch;
+    font-size: var(--fs-md);
+}
+
+.signup-brand__list{
+    list-style: none;
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.signup-brand__list li{
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: rgba(255,255,255,0.9);
+    font-size: var(--fs-sm);
+}
+
+.signup-brand__bullet{
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--color-brand-highlight);
+    flex-shrink: 0;
+}
+
+/* ---------------- Right form panel ---------------- */
+.signup-form-panel{
+    flex: 1 1 55%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-5);
+}
+
+.signup-card{
+    width: 100%;
+    max-width: 440px;
+}
+
+.signup-card__header{
+    text-align: center;
+    margin-bottom: var(--space-5);
+}
+
+.signup-card__header h2{
+    font-size: var(--fs-xl);
+}
+
+.signup-card__header p{
+    color: var(--color-text-secondary);
+    font-size: var(--fs-sm);
+    margin-bottom: 0;
+}
+
+/* Username availability indicator */
+.username-status{
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--fs-xs);
+    margin-top: var(--space-1);
+    min-height: 1.1em;
+}
+.username-status[data-state="checking"]{ color: var(--color-text-muted); }
+.username-status[data-state="available"]{ color: var(--color-status-success); }
+.username-status[data-state="taken"]{ color: var(--color-status-danger); }
+
+/* Secret question select + custom question reveal */
+.secret-question-custom{
+    margin-top: var(--space-3);
+    display: none;
+}
+.secret-question-custom.is-visible{ display: block; }
+
+/* Password strength meter */
+.password-strength{
+    display: flex;
+    gap: 4px;
+    margin-top: var(--space-2);
+}
+.password-strength__bar{
+    height: 4px;
+    flex: 1;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-border-default);
+    transition: background-color var(--transition-fast);
+}
+.password-strength__bar.is-weak{ background-color: var(--color-status-danger); }
+.password-strength__bar.is-medium{ background-color: var(--color-status-warning); }
+.password-strength__bar.is-strong{ background-color: var(--color-status-success); }
+
+.password-strength__label{
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
+    margin-top: var(--space-1);
+}
+
+.signup-terms{
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
+    text-align: center;
+    margin: var(--space-4) 0 0;
+}
+
+.signup-card__footer{
+    text-align: center;
+    margin-top: var(--space-5);
+    font-size: var(--fs-sm);
+    color: var(--color-text-secondary);
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 900px){
+    .signup-brand{ display: none; }
+    .signup-form-panel{ flex: 1 1 100%; padding: var(--space-4); }
+}
+
+@media (max-width: 480px){
+    .signup-card{ max-width: 100%; }
+    .card{ padding: var(--space-5) var(--space-4); box-shadow: none; }
+}
+
+
+
+
+/* =========================================================
+   Additions for signup.css
+   Layout for the 3 separate security-answer boxes, plus a
+   disabled state for them before a question set is chosen.
+   Colors below are pulled straight from base_template.css's
+   :root variables (see note at bottom) — nothing here is a
+   new hardcoded hex value, so light/dark theme keep working
+   automatically.
+   ========================================================= */
+
+.security-answers-row {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.security-answer-input {
+    flex: 1 1 0;
+    min-width: 0; /* lets flex-basis shrink below content width on narrow screens */
+}
+
+@media (max-width: 480px) {
+    .security-answers-row {
+        flex-direction: column;
+    }
+}
+
+.security-answer-input:disabled {
+    background-color: var(--color-surface-page);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+}
