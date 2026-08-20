@@ -15,7 +15,7 @@ AUTH_USER_MODEL = 'Account.CustomUser'
 
 PROJECT_BASE_URL = os.getenv("PROJECT_BASE_URL")
  
-ALLOWED_HOSTS = os.getenv(PROJECT_BASE_URL, 'localhost,').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOST', 'localhost,').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
