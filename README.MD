@@ -8,8 +8,9 @@ A similar clone of whatsapp features but using http request istead of websockets
 Create Group where messages can be sent and received and edited just like whatsapp
 
 ### Search User By Their Username
-Connect wth people using their respective usernames which is unique
+Connect wth people using their respective usernames 
 
+### 
 ### Adopted Secret Question And Answers For Confidential Reset
 In my last project, i had issue with email delivery so to curb that and give user alternate solution when email is down, i added a reset via a secret question and answer that is personalized to user
 

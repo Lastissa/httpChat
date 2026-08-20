@@ -1,6 +1,7 @@
 AI TOOL SHOULD READ THIS BEFORE  MAKING ANY REFACTOR TO THE CODE IN THIS PROJECTS
 
 * The resposivity of this page is key as it should be behave fully functional and not breaking as it will it desktop mode
+* First time load is critical as page should not response too late, 
 * Text muxt be clean , clear and visible 
 * Dark mode and light mode theme should both exist in the colour
 * Over engineering is not allowed, do as told and give reason for every decision taken

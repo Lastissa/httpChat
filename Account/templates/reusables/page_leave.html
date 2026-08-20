@@ -1,0 +1,27 @@
+{% comment %}
+    page_leave.html
+    ---------------------------------------------------------
+    Structurally identical to page_open.html, rendered as a
+    second, separate overlay that starts hidden. base_template.js
+    shows it the instant the user clicks an internal link or a
+    form is about to redirect, so the outgoing page's loader is
+    already on screen before the browser's own "waiting for
+    next page" spinner would appear — no blank/frozen moment.
+
+    KNOWN-ISSUE FIX: if the user opens a page, navigates away,
+    then hits the BROWSER BACK BUTTON, some browsers restore the
+    old page from the back/forward cache (bfcache) WITHOUT re-
+    running page-load JS — which previously could leave this
+    overlay stuck visible over a page that's actually already
+    loaded. Fixed via the `pageshow` listener in base_template.js:
+    on `event.persisted === true` (a bfcache restore), the overlay
+    is force-hidden immediately, no animation, no timeout wait.
+{% endcomment %}
+<div class="page-loader" id="page-leave-loader" role="status" aria-live="polite" aria-label="Loading next page" hidden>
+    <div class="page-loader__content">
+        <svg class="page-loader__bolt" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M13 2 L4 14 h6 l-1 8 L20 10 h-6 Z"></path>
+        </svg>
+        <span class="page-loader__label">Loading&hellip;</span>
+    </div>
+</div>

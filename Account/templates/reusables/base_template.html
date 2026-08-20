@@ -6,7 +6,7 @@
 
     <title>{% block title %}{% endblock title %} | {{ project_name }}</title>
     <meta name="description" content="{% block extra_description %}{{ project_description }}{% endblock extra_description %}">
-    <meta name="keywords" content="{% block keywords %}httpchat, chat app, real-time messaging, online chat{% endblock keywords %}">
+    <meta name="keywords" content="{% block keywords %}httpchat, chat app, online chat{% endblock keywords %}">
     <meta name="robots" content="{% block robots_content %}index, follow{% endblock robots_content %}">
     <meta name="author" content="{{ project_name }}">
     <link rel="canonical" href="{{ project_base_url }}{% block canonical %}{% endblock canonical %}">
@@ -17,7 +17,7 @@
     <meta property="og:title" content="{% block og_title %}{{ project_name }}{% endblock og_title %}">
     <meta property="og:description" content="{% block og_description %}{{ project_description }}{% endblock og_description %}">
     <meta property="og:url" content="{{ project_base_url }}{% block og_url %}{% endblock og_url %}">
-    <meta property="og:image" content="{% block og_image %}{% static 'images/og-default.png' %}{% endblock og_image %}">
+    <meta property="og:image" content="{% block og_image %}{% static 'img/httpchat_logo.png' %}{% endblock og_image %}">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
@@ -26,28 +26,64 @@
 
     <meta name="theme-color" content="{% block theme_color %}#075E54{% endblock theme_color %}">
     <link rel="icon" type="image/png" href="{% block favicon %}{% static 'img/httpchat_logo.png' %}{% endblock favicon %}">
+    <!-- Light css -->
+    <link rel="stylesheet" href="{% static 'base_template_light.css' %}">
+    {% block extra_css_light %}{% endblock extra_css_light %}
+    <!-- Heavy css; Used media so its the least load, will change to preload if this is not ideal -->
+    <link rel="stylesheet" href="{% static 'base_template_heavy.css' %}" media="print" onload="this.media='all'">
+    {% block extra_css_heavy %}{% endblock extra_css_heavy %}
+    <!-- On the Heavy css failure -->
+    <noscript>
+        <link rel="stylesheet" href="{% static 'base_template_heavy.css' %}">
+        {% block extra_css_heavy_noscript %}{% endblock extra_css_heavy_noscript %}
+    </noscript>
 
-
-    <link rel="stylesheet" href="{% static 'base_template.css' %}">
-
-    {% block extra_css %}
-    {% comment %} Page-specific stylesheets go here, e.g.{% endcomment %}
-    {% endblock extra_css %}
+    {% comment %}
+        ============================= SEO / GEO: structured data =============================
+        Base JSON-LD (Organization + WebSite) present on every page — this is what lets
+        search engines show a proper site name/logo in results, and gives AI answer
+        engines (ChatGPT browsing, Perplexity, Google AI Overviews, etc. — "GEO", the
+        LLM-facing counterpart to SEO) an unambiguous, structured fact set to quote
+        instead of having to infer it from prose. Pages needing more (e.g. an
+        auth page describing itself) extend {% block structured_data_page %}.
+        ========================================================================================
+    {% endcomment %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Product",
+                "name": "{{ project_name }}",
+                "url": "{{ project_base_url }}",
+                "logo": "{{ project_base_url }}{% static 'img/httpchat_logo.png' %}"
+            },
+            {
+                "@type": "WebSite",
+                "name": "{{ project_name }}",
+                "url": "{{ project_base_url }}",
+                "description": "{{ project_description }}"
+            }
+        ]
+    }
+    </script>
+    {% block structured_data_page %}{% endblock structured_data_page %}
 
     {% block extra_head %}
-    {% comment %} Any extra tags a page needs (structured data, preloads, etc.) {% endcomment %}
+    {% comment %} Any extra tags a page needs (preloads, etc.) {% endcomment %}
     {% endblock extra_head %}
 </head>
 <body class="{% block body_class %}{% endblock body_class %}">
 
+    {% include "reusables/page_open.html" %}
+
     {% block nav %}{% include "reusables/nav.html" %}{% endblock nav %}
     {% comment %}
-        Persistent nav, on by default: any page inherits it just by
-        extending this template overite it by giving empty div.
+        Persistent NAV, on by default: any page inherits it by
+        extending this template, overide it by giving empty div.
     {% endcomment %}
 
     {% if messages %}
-
     <div class="site-messages container" role="status" aria-live="polite">
         {% for message in messages %}
         <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-error{% endif %}" role="alert">
@@ -59,7 +95,7 @@
 
     <main>
         {% block body_content %}
-        <h1>Main Body Content; Nothing Here</h1>
+        <h1>Main Body Content; DEFAULT is 'Nothing Here', IF YOU ARE SEEING THIS, I AM COOKED BECAUSE ITS IMPOSSIBLE AS ITS A BASE TEMPLATE AND USER IS NOT SUPPSOED TO SEE IT</h1>
         {% endblock body_content %}
     </main>
 
@@ -69,10 +105,24 @@
         {% endblock footer_content %}
     </footer>
 
-
+    {% comment %}
+        Client-side toast region, created empty here (not by JS) so
+        assistive tech registers the 'aria-live'(screen reader assitant) region on first paint.IMPORTANT
+        Capped at 3 visible toasts at once; see MAX_VISIBLE_TOASTS in
+        base_template.js.
+    {% endcomment %}
     <div class="toast-region" id="toast-region" role="status" aria-live="polite"></div>
 
-    <!-- Shared site-wide JS (CSRF fetch helper, toasts, theme + nav, password toggles, etc.) -->
+    {% comment %}
+        Page-leave overlay — hidden until JS shows it right before an
+        outbound navigation. Kept as a separate element from page-open's
+        loader (rather than reusing #page-loader) so a page can be
+        "arriving" and "about to leave" without those two states ever
+        fighting over one element's visibility.
+    {% endcomment %}
+    {% include "reusables/page_leave.html" %}
+
+    <!-- Shared site-wide JS (CSRF fetch helper, toasts, theme + nav, password toggles, page loader, etc.) -->
     <script src="{% static 'base_template.js' %}" defer></script>
 
     {% block extra_js %}

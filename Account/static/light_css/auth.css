@@ -1,0 +1,230 @@
+/* =========================================================
+   light_css/auth.css
+   -------------------------------------------------------
+   Shared STRUCTURAL styling for every auth screen (signup,
+   login, forgot-password). One shared file instead of three
+   near-duplicate ones , signup/login/forgot-password all use
+   the exact same split-panel shell, so page-specific CSS
+   would just be copy-pasted drift. Anything genuinely unique
+   to one page (its illustration text, its exact copy) lives
+   in that page's own <template>, not here.
+
+   Loaded synchronously (critical) because the auth layout
+   itself — the two-column split, and which column is visible
+   on which screen size — must be correct on first paint, or
+   the page visibly reflows once CSS finishes loading. The
+   decorative gradient/glow treatment for the aside panel is
+   in heavy_css/auth.css instead.
+   ========================================================= */
+
+/* ---------------- Shell: full-height split panel ---------------- */
+.auth-screen{
+    display: flex;
+    min-height: calc(100vh - var(--nav-height));
+    background-color: var(--color-surface-page);
+}
+
+/* ---------------- Left/aside: brand panel ----------------
+   position: sticky (not fixed) so it pins to the viewport
+   while the right panel scrolls, WITHOUT leaving the rest of
+   the page unable to scroll past it — it releases naturally
+   once its own column's content (which is short) has been
+   fully scrolled past.*/
+.auth-aside{
+    flex: 1 1 42%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-7);
+    color: var(--color-text-on-brand);
+    background-color: var(--color-brand-primary); /* flat fallback; heavy CSS adds the gradient */
+    position: sticky;
+    top: var(--nav-height);
+    align-self: flex-start;
+    height: calc(100vh - var(--nav-height));
+    overflow: hidden;
+}
+
+.auth-aside__logo{ width: 44px; height: 44px; margin-bottom: var(--space-2); }
+
+.auth-aside h1{
+    color: var(--color-text-on-brand);
+    font-size: var(--fs-xxl);
+    max-width: 18ch;
+}
+.auth-aside p{
+    color: rgba(255,255,255,0.85);
+    max-width: 38ch;
+    font-size: var(--fs-md);
+}
+
+.auth-aside__list{
+    list-style: none;
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+.auth-aside__list li{
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: rgba(255,255,255,0.9);
+    font-size: var(--fs-sm);
+}
+.auth-aside__bullet{
+    width: 8px; height: 8px; border-radius: 50%;
+    background-color: var(--color-brand-highlight);
+    flex-shrink: 0;
+}
+
+/* ---------------- Right: form panel ----------------
+   No .card / border wrapper here on purpose — the aside
+   already visually separates "brand" from "form", so a
+   second border around the form content just duplicates
+   that separation and adds visual noise. The form sits
+   directly on the page background. ------------------- */
+.auth-form-panel{
+    flex: 1 1 58%;
+    display: flex;
+    justify-content: center;
+    padding: var(--space-6) var(--space-5);
+    overflow-y: auto;
+}
+
+.auth-card{
+    width: 100%;
+    max-width: 440px;
+}
+
+.auth-card__header{ margin-bottom: var(--space-5); }
+.auth-card__header h2{ font-size: var(--fs-xl); }
+.auth-card__header p{ color: var(--color-text-secondary); font-size: var(--fs-sm); margin-bottom: 0; }
+
+.auth-card__footer{
+    text-align: center;
+    margin-top: var(--space-5);
+    font-size: var(--fs-sm);
+    color: var(--color-text-secondary);
+}
+.auth-card__footer a{ color: var(--color-text-link); font-weight: 600; }
+
+.auth-terms{
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
+    text-align: center;
+    margin: var(--space-4) 0 0;
+}
+
+/* ---------------- Username availability indicator ---------------- */
+.username-check-row{ display: flex; gap: var(--space-2); align-items: flex-start; }
+.username-check-row .field-input{ flex: 1 1 auto; }
+.username-check-btn{ flex-shrink: 0; white-space: nowrap; }
+
+.username-status{
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--fs-xs);
+    margin-top: var(--space-1);
+    min-height: 1.1em;
+}
+.username-status[data-state="checking"]{ color: var(--color-text-muted); }
+.username-status[data-state="available"]{ color: var(--color-status-success); }
+.username-status[data-state="taken"]{ color: var(--color-status-danger); }
+.username-status[data-state="error"]{ color: var(--color-status-warning); }
+
+/* ---------------- Password strength meter ---------------- */
+.password-strength{ display: flex; gap: 4px; margin-top: var(--space-2); }
+.password-strength__bar{
+    height: 4px; flex: 1;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-border-default);
+    transition: background-color var(--transition-fast);
+}
+.password-strength__bar.is-weak{ background-color: var(--color-status-danger); }
+.password-strength__bar.is-medium{ background-color: var(--color-status-warning); }
+.password-strength__bar.is-strong{ background-color: var(--color-status-success); }
+.password-strength__label{ font-size: var(--fs-xs); color: var(--color-text-muted); margin-top: var(--space-1); }
+
+/* ---------------- Security question set + per-answer boxes ---------------- */
+.security-questions-preview{
+    margin: var(--space-2) 0 0;
+    padding-left: var(--space-4);
+    font-size: var(--fs-xs);
+    color: var(--color-text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.security-answers-row{ display: flex; gap: var(--space-2); }
+.security-answer-input{ flex: 1 1 0; min-width: 0; }
+.security-answer-input:disabled{
+    background-color: var(--color-surface-page);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+}
+@media (max-width: 480px){
+    .security-answers-row{ flex-direction: column; }
+}
+
+/* ---------------- Forgot-password method tabs ---------------- */
+.auth-tabs{
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+    border-bottom: 1px solid var(--color-border-subtle);
+}
+.auth-tab{
+    flex: 1;
+    text-align: center;
+    padding: var(--space-3) var(--space-2);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+.auth-tab[aria-selected="true"]{
+    color: var(--color-action-primary);
+    border-bottom-color: var(--color-action-primary);
+}
+.auth-tab-panel[hidden]{ display: none; }
+
+/* ---------------- Responsive ----------------
+   the aside COLLAPSES into a compact horizontal hero strip:
+   logo + one line of copy, not the full pitch + bullet list.
+   This keeps mobile from being a long boring wall of fields
+   before the user even reaches the form. -------------------- */
+@media (max-width: 900px){
+    .auth-screen{ flex-direction: column; min-height: 0; }
+
+    .auth-aside{
+        position: static;
+        height: auto;
+        flex: 0 0 auto;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-4);
+    }
+    .auth-aside__logo{ width: 32px; height: 32px; margin-bottom: 0; }
+    .auth-aside h1{ font-size: var(--fs-lg); max-width: none; margin-bottom: 0; }
+    /* Full pitch copy + bullet list are pure "why sign up" marketing —
+       useful on desktop where there's idle space, but on mobile they'd
+       just push the actual form further down, so they're dropped
+       entirely rather than shown, scrolled, or accordioned. */
+    .auth-aside p,
+    .auth-aside__list{ display: none; }
+
+    .auth-form-panel{ padding: var(--space-5) var(--space-4); overflow-y: visible; }
+}
+
+@media (max-width: 480px){
+    .auth-card{ max-width: 100%; }
+}

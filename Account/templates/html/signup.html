@@ -1,234 +1,168 @@
 {% extends "reusables/base_template.html" %}
 {% load static %}
 
-{% block title %}Sign Up{% endblock title %}
-{% block extra_description %}Create your free {{ project_name }} account and start chatting in seconds.{% endblock extra_description %}
-{% block keywords %}httpchat signup, create account, chat app registration{% endblock keywords %}
+{% block title %}Create your free account{% endblock title %}
 {% block canonical %}signup/{% endblock canonical %}
-{% block og_title %}Create your {{ project_name }} account{% endblock og_title %}
-{% block og_description %}Sign up for {{ project_name }} — simple, fast messaging.{% endblock og_description %}
+{% block extra_description %}Create your free {{ project_name }} account in seconds and start chatting with anyone by username, no phone number required.{% endblock extra_description %}
+{% block og_title %}Create your free {{ project_name }} account{% endblock og_title %}
+{% block og_description %}Sign up in seconds and start chatting by username.{% endblock og_description %}
 {% block og_url %}signup/{% endblock og_url %}
-{% block body_class %}signup-page{% endblock body_class %}
+{% block twitter_title %}Create your free {{ project_name }} account{% endblock twitter_title %}
+{% block twitter_description %}Sign up in seconds and start chatting by username.{% endblock twitter_description %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/signup.css' %}">
-{% endblock extra_css %}
+{% block structured_data_page %}
+<script type="application/ld+json">
+{
+    "@type": "WebPage",
+    "name": "Create your {{ project_name }} account",
+    "description": "{{ project_description }}",
+    "isPartOf": { "@type": "WebSite", "name": "{{ project_name }}", "url": "{{ project_base_url }}" }
+}
+</script>
+{% endblock structured_data_page %}
+
+{% block extra_css_light %}<link rel="stylesheet" href="{% static 'light_css/auth.css' %}">{% endblock extra_css_light %}
+{% block extra_css_heavy %}<link rel="stylesheet" href="{% static 'heavy_css/auth.css' %}" media="print" onload="this.media='all'">{% endblock extra_css_heavy %}
+{% block extra_css_heavy_noscript %}<link rel="stylesheet" href="{% static 'heavy_css/auth.css' %}">{% endblock extra_css_heavy_noscript %}
 
 {% block body_content %}
-<div class="signup-screen">
-    <!-- Brand panel: shown side-by-side on desktop, stacked above the form on mobile -->
-    <aside class="signup-brand">
-        <div class="signup-brand__logo-wrap">
-            <img src="{% static "img/httpchat_logo.png" %}" alt="{{ project_name }} logo" width="272" height="104" decoding="async">
-        </div>
-        <h1>Simple. Secure. Reliable messaging.</h1>
-        <p>{{ project_description }}</p>
-        <ul class="signup-brand__list">
-            <li><span class="signup-brand__bullet" aria-hidden="true"></span> Free to join</li>
-            <li><span class="signup-brand__bullet" aria-hidden="true"></span> Your data stays yours</li>
-            <li><span class="signup-brand__bullet" aria-hidden="true"></span> Chat from any device</li>
+<div class="auth-screen">
+
+    <!-- Brand panel: sticky on desktop so it stays visible while the
+         (longer) form panel scrolls; collapses to a compact horizontal
+         strip on mobile instead of a long stacked hero , see
+         light_css/auth.css .auth-aside media query. -->
+    <aside class="auth-aside">
+        <svg class="auth-aside__logo" viewBox="0 0 40 40" aria-hidden="true">
+            <rect width="40" height="40" rx="12" fill="#fff" fill-opacity="0.15"></rect>
+            <circle cx="13" cy="22" r="3.4" fill="#fff"></circle>
+            <circle cx="20" cy="22" r="3.4" fill="#fff"></circle>
+            <circle cx="27" cy="22" r="3.4" fill="#fff"></circle>
+        </svg>
+        <h1>Start chatting instantly, no phone number needed</h1>
+        <p>{{ project_description }} Create a username, and anyone can reach you with it, .</p>
+        <ul class="auth-aside__list">
+            <li><span class="auth-aside__bullet" aria-hidden="true"></span> Free to join, ready in under a minute</li>
+            <li><span class="auth-aside__bullet" aria-hidden="true"></span> Recover your account by email or security question</li>
+            <li><span class="auth-aside__bullet" aria-hidden="true"></span> Light and dark themes built in</li>
         </ul>
     </aside>
 
-    <section class="signup-form-panel">
-        <div class="signup-card">
-            <div class="card">
+    <div class="auth-form-panel">
+        <div class="auth-card">
+            <div class="auth-card__header">
+                <h2>Create your account</h2>
+                <p>It's quick, and free.</p>
+            </div>
 
-                <div class="signup-card__header">
-                    <h2>Create Account</h2>
-                    <p>It only takes a minute to get started</p>
+            <form id="signup-form" method="post" action="{% url 'account_signup' %}" novalidate>
+                {% csrf_token %}
+
+                <div class="field">
+                    <label for="signup-username">Username</label>
+                    <div class="username-check-row">
+                        <input class="field-input" type="text" id="signup-username" name="username"
+                               autocomplete="username" required minlength="3" maxlength="100"
+                               aria-describedby="signup-username-status signup-username-error">
+                        <button type="button" class="btn btn-text username-check-btn" id="signup-username-check">Check</button>
+                    </div>
+                    <p class="username-status" id="signup-username-status" data-state="" aria-live="polite"></p>
+                    <span class="field-error" id="signup-username-error" role="alert"></span>
                 </div>
 
-                <!-- General, top-of-form error summary. Hidden by default; JS
-                     populates + reveals it when submit is blocked by
-                     validation, and moves focus here for a11y. -->
-                <div class="alert alert-error" id="signup-error-summary" role="alert" hidden></div>
+                <div class="field">
+                    <label for="signup-email">Email</label>
+                    <input class="field-input" type="email" id="signup-email" name="email"
+                           autocomplete="email" required aria-describedby="signup-email-error">
+                    <span class="field-error" id="signup-email-error" role="alert"></span>
+                </div>
 
-                <form id="signup-form" method="post" action="{% url 'account_signup' %}" novalidate>
-                    {% csrf_token %}
-
-                    <!-- Email -->
-                    <div class="field">
-                        <label for="id_email">Email address</label>
-                        <input
-                            class="field-input"
-                            type="email"
-                            id="id_email"
-                            name="email"
-                            placeholder="you@example.com"
-                            autocomplete="email"
-                            required>
-                        <span class="field-error" id="email-error"></span>
+                <div class="field">
+                    <label for="signup-password">Password</label>
+                    <div class="input-group">
+                        <input class="field-input" type="password" id="signup-password" name="password"
+                               autocomplete="new-password" required minlength="8"
+                               aria-describedby="signup-password-error">
+                        <button type="button" class="input-group-btn" data-toggle-password data-target="#signup-password"
+                                aria-pressed="false" aria-label="Show password">
+                            <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-5.94M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+                                <path d="M1 1l22 22"></path>
+                            </svg>
+                        </button>
                     </div>
-
-                    <!-- Username -->
-                    <div class="field">
-                        <label for="id_username">Username</label>
-                        {% comment %}
-                            "Check availability" is a manual, button-triggered
-                            check (not on every keystroke) so we don't spam the
-                            backend. It POSTs the typed username + the email
-                            above (see signup.js) so the backend can suggest an
-                            alternative if the username is already taken.
-                            TODO(backend): endpoint is a placeholder for now —
-                            see USERNAME_CHECK_ENDPOINT in signup.js.
-                        {% endcomment %}
-                        <div class="username-check-row">
-                            <input
-                                class="field-input"
-                                type="text"
-                                id="id_username"
-                                name="username"
-                                placeholder="Choose a unique username"
-                                autocomplete="username"
-                                minlength="3"
-                                maxlength="100"
-                                required>
-                            <button type="button" class="btn btn-text username-check-btn" id="check-username-btn">
-                                Check availability
-                            </button>
-                        </div>
-                        <span class="field-hint">
-                            We only use this to check the username is free. Filling in your email
-                            above first is recommended (not required), it lets us suggest a more
-                            personalized alternative if this username is already taken. Nothing is
-                            saved until you submit the form.
-                        </span>
-                        <span class="field-error" id="username-error"></span>
-                        <div class="username-status" id="username-status" data-state="" aria-live="polite"></div>
+                    <div class="password-strength" id="signup-password-strength" aria-hidden="true">
+                        <span class="password-strength__bar"></span><span class="password-strength__bar"></span><span class="password-strength__bar"></span>
                     </div>
+                    <p class="password-strength__label" id="signup-password-strength-label"></p>
+                    <span class="field-error" id="signup-password-error" role="alert"></span>
+                </div>
 
-                    <!-- Password -->
-                    <div class="field">
-                        <label for="id_password">Password</label>
-                        <div class="input-group">
-                            <input
-                                class="field-input"
-                                type="password"
-                                id="id_password"
-                                name="password"
-                                placeholder="At least 8 characters"
-                                autocomplete="new-password"
-                                minlength="8"
-                                required>
-                            <button type="button" class="input-group-btn" data-toggle-password data-target="#id_password" aria-pressed="false">Show</button>
-                        </div>
-                        <div class="password-strength" aria-hidden="true">
-                            <span class="password-strength__bar"></span>
-                            <span class="password-strength__bar"></span>
-                            <span class="password-strength__bar"></span>
-                            <span class="password-strength__bar"></span>
-                            <span class="password-strength__bar"></span>
-                        </div>
-                        <div class="password-strength__label" id="password-strength-label"></div>
-                        <span class="field-error" id="password-error"></span>
+                <div class="field">
+                    <label for="signup-password-confirm">Confirm password</label>
+                    <div class="input-group">
+                        <input class="field-input" type="password" id="signup-password-confirm" name="password_confirm"
+                               autocomplete="new-password" required aria-describedby="signup-password-confirm-error">
+                        <button type="button" class="input-group-btn" data-toggle-password data-target="#signup-password-confirm"
+                                aria-pressed="false" aria-label="Show password">
+                            <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-5.94M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+                                <path d="M1 1l22 22"></path>
+                            </svg>
+                        </button>
                     </div>
+                    <span class="field-error" id="signup-password-confirm-error" role="alert"></span>
+                </div>
 
-                    <!-- Confirm password -->
-                    <div class="field">
-                        <label for="id_password_confirm">Confirm password</label>
-                        <div class="input-group">
-                            <input
-                                class="field-input"
-                                type="password"
-                                id="id_password_confirm"
-                                name="password_confirm"
-                                placeholder="Re-enter your password"
-                                autocomplete="new-password"
-                                required>
-                            <button type="button" class="input-group-btn" data-toggle-password data-target="#id_password_confirm" aria-pressed="false">Show</button>
-                        </div>
-                        <span class="field-error" id="confirm-error"></span>
+                <div class="field">
+                    <label for="signup-secret-question">Security question set</label>
+                    <p class="field-hint">Used to recover your account if you ever lose access to your email.</p>
+                    <select class="field-input" id="signup-secret-question" name="secret_question" required
+                            aria-describedby="signup-secret-question-error">
+                        <option value="" selected disabled>Choose a set of questions&hellip;</option>
+                        {% for index, question_set in security_questions %}
+                        <option value="{{ index }}" data-questions="{{ question_set }}">Question set {{ index|add:1 }}</option>
+                        {% endfor %}
+                    </select>
+                    <ul class="security-questions-preview" id="signup-questions-preview" hidden></ul>
+                    <span class="field-error" id="signup-secret-question-error" role="alert"></span>
+                </div>
+
+                <div class="field">
+                    <label>Your answers</label>
+                    <p class="field-hint">Answers are case-sensitive — remember exactly how you type them.</p>
+                    <div class="security-answers-row">
+                        <input class="field-input security-answer-input" type="text" name="secret_answer_1"
+                               id="signup-secret-answer-1" placeholder="Answer 1" disabled autocomplete="off">
+                        <input class="field-input security-answer-input" type="text" name="secret_answer_2"
+                               id="signup-secret-answer-2" placeholder="Answer 2" disabled autocomplete="off">
+                        <input class="field-input security-answer-input" type="text" name="secret_answer_3"
+                               id="signup-secret-answer-3" placeholder="Answer 3" disabled autocomplete="off">
                     </div>
+                    <span class="field-error" id="signup-secret-answer-1-error" role="alert"></span>
+                </div>
 
-                    <!-- Security questions (fallback recovery instead of email) -->
+                <button type="submit" class="btn btn-primary btn-block">Create account</button>
+            </form>
 
-                    <div class="field">
-                        <label for="id_secret_question">Security questions</label>
-                        <select class="field-input" id="id_secret_question" name="secret_question" required>
-                            <option value="" disabled selected>Choose a set of security questions</option>
-                            {% for question_set in security_questions %}
-                            <option value="{{ question_set }}">Question set {{ forloop.counter }}</option>
-                            {% endfor %}
-                        </select>
-                        <span class="field-hint">
-                            Used only to verify it's you if you ever lose access to your account and
-                            email recovery isn't available. We never use these answers for anything else.
-                        </span>
+            <p class="auth-terms">By creating an account you agree to our Terms of Service and Privacy Policy.</p>
 
-                        <ol class="security-questions-preview" id="security-questions-preview" hidden></ol>
-                        <span class="field-error" id="secret-question-error"></span>
-                    </div>
-
-                    <!-- Secret answers: one dedicated box per question in the
-                         chosen set above, instead of one free-text field the
-                         user has to space-separate correctly. Boxes are
-                         disabled until a question set is picked, and their
-                         placeholders are filled in with the actual question
-                         text by signup.js so it's obvious which box answers
-                         which question. -->
-                    <div class="field">
-                        <label id="secret-answers-label">Your answers</label>
-                        <div class="security-answers-row" role="group" aria-labelledby="secret-answers-label">
-                            <input
-                                class="field-input security-answer-input"
-                                type="text"
-                                id="id_secret_answer_1"
-                                name="secret_answer_1"
-                                placeholder="Answer 1"
-                                maxlength="150"
-                                disabled
-                                required>
-                            <input
-                                class="field-input security-answer-input"
-                                type="text"
-                                id="id_secret_answer_2"
-                                name="secret_answer_2"
-                                placeholder="Answer 2"
-                                maxlength="150"
-                                disabled
-                                required>
-                            <input
-                                class="field-input security-answer-input"
-                                type="text"
-                                id="id_secret_answer_3"
-                                name="secret_answer_3"
-                                placeholder="Answer 3"
-                                maxlength="150"
-                                disabled
-                                required>
-                        </div>
-                        <span class="field-hint">
-                            Answer each question in its own box, in order. Answers are
-                            case-sensitive, so type them exactly how you'll remember them.
-                        </span>
-                        <span class="field-error" id="answer-error"></span>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-block" id="signup-submit">
-                        Sign Up
-                    </button>
-
-                    <p class="signup-terms">
-                        By signing up you agree to {{ project_name }}'s Terms of Service and Privacy Policy.
-                    </p>
-                </form>
-
-                <p class="signup-card__footer">
-                    Already have an account? <a href="#">Log in</a>
-                </p>
-
+            <div class="auth-card__footer">
+                Already have an account? <a href="{% url 'account_login' %}">Log in</a>
             </div>
         </div>
-    </section>
-
+    </div>
 </div>
 {% endblock body_content %}
 
-{% block footer_content %}
-<a href = "#">Staff Signup </a>
-{% endblock footer_content %}
-
 {% block extra_js %}
 <script src="{% static 'js/signup.js' %}" defer></script>
-{% endblock extra_js%}
+{% endblock extra_js %}

@@ -11,7 +11,11 @@ SECRET_KEY = os.getenv("django_secret_key")
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+AUTH_USER_MODEL = 'Account.CustomUser'
+
+PROJECT_BASE_URL = os.getenv("PROJECT_BASE_URL")
+ 
+ALLOWED_HOSTS = os.getenv(PROJECT_BASE_URL, 'localhost,').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -20,15 +24,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    'django.contrib.sitemaps',  # ADDED: sitemap.xml for SEO — see HTTP_CHAT_APP/urls.py + Account/sitemaps.py
+
     'Account',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'Account.middleware.MaintanceMiddleWare',
-     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -91,20 +95,28 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+# MAILERS = {
+#     'default': {
+#         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+#     },
+# }
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # prints "sent" mail to the console/log.
+                                                                    # Swap for a real SMTP backend in production.
+DEFAULT_FROM_EMAIL = f'no-reply@{ALLOWED_HOSTS[0] if ALLOWED_HOSTS[0] != "*" else "httpchat.local"}'
 
-SERVICE_MODE = os.getenv('SERVICE_MODE') is not None
+REMOVE_SERVICE_MODE = os.getenv('REMOVE_SERVICE_MODE') or True    #   Auto On if this is missing in the env
 
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
-        "LOCATION": "my_cache_table",
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# --- Auth redirects ---
+LOGIN_URL = 'account_login'
+LOGIN_REDIRECT_URL = 'account_home'
+LOGOUT_REDIRECT_URL = 'account_login'
+

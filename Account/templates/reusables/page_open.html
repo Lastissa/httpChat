@@ -1,0 +1,27 @@
+{% comment %}
+    page_open.html
+    ---------------------------------------------------------
+    The FIRST thing painted in <body>, before nav/content. It
+    covers the unstyled-content flash while base_template_heavy.css
+    (and any page-specific heavy CSS) loads in the background.
+
+    Hidden by base_template.js once:
+      a) both heavy stylesheets have fired their onload, AND
+      b) DOMContentLoaded has fired
+    OR, regardless of the above, after PAGE_LOADER_HARD_TIMEOUT_MS
+    (8000ms) — whichever comes first — so a slow network can
+    never leave a visitor stuck staring at this.
+
+    All animation lives in base_template_heavy.css (this overlay's
+    *skeleton* — position/size/colours — is in the critical
+    base_template_light.css so it can render instantly, before
+    that heavy file has even arrived).
+{% endcomment %}
+<div class="page-loader" id="page-loader" role="status" aria-live="polite" aria-label="Loading">
+    <div class="page-loader__content">
+        <svg class="page-loader__bolt" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M13 2 L4 14 h6 l-1 8 L20 10 h-6 Z"></path>
+        </svg>
+        <span class="page-loader__label">Loading&hellip;</span>
+    </div>
+</div>

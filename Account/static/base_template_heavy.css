@@ -1,0 +1,122 @@
+/* =========================================================
+   NON-CRITICAL stylesheet. Loaded asynchronously AFTER first
+   paint (see reusables/page_open.html for the preload-swap
+   trick that does this) so it can never block rendering.
+
+   Holds: the lightning-bolt loading animation, and general
+   "modern" decorative polish (motion, depth, refined hover
+   states) for elements already laid out by
+   base_template_light.css. Deliberately NOT glassmorphic —
+   no frosted blur panels — those are heavy to render and read
+   as dated; depth here comes from shadow + a single accent
+   colour instead.
+   ========================================================= */
+
+/* =========================================================
+   1. LIGHTNING-BOLT LOADER
+   -------------------------------------------------------
+   Pure CSS/SVG, no external image. A bolt shape "strikes" in
+   (scale + flash) then holds a subtle pulsing glow so it
+   reads as "still working" rather than "frozen". Runs for as
+   long as the overlay is visible; base_template.js force-
+   removes the overlay at 8s regardless (see
+   PAGE_LOADER_HARD_TIMEOUT_MS) so a slow heavy-CSS load can
+   never leave a visitor stuck looking at it.
+   ========================================================= */
+.page-loader__bolt{
+    width: 64px;
+    height: 64px;
+    filter: drop-shadow(0 0 0 rgba(0, 168, 132, 0));
+    animation: bolt-strike 1.1s cubic-bezier(.36,1.4,.4,1) infinite;
+}
+.page-loader__bolt path{
+    fill: var(--color-action-primary);
+}
+
+@keyframes bolt-strike{
+    0%{
+        transform: scale(0.85) translateY(-2px);
+        filter: drop-shadow(0 0 0 rgba(0, 168, 132, 0));
+        opacity: 0.75;
+    }
+    12%{
+        transform: scale(1.08) translateY(0);
+        filter: drop-shadow(0 0 14px rgba(0, 168, 132, 0.65));
+        opacity: 1;
+    }
+    28%{
+        transform: scale(0.98) translateY(0);
+        filter: drop-shadow(0 0 6px rgba(0, 168, 132, 0.4));
+        opacity: 1;
+    }
+    100%{
+        transform: scale(0.98) translateY(0);
+        filter: drop-shadow(0 0 6px rgba(0, 168, 132, 0.4));
+        opacity: 1;
+    }
+}
+
+/* The "Loading" label pulses gently in sync so the whole unit
+   feels alive without adding a second, competing animation. */
+.page-loader__label{ animation: label-pulse 1.1s ease-in-out infinite; }
+@keyframes label-pulse{
+    0%, 100%{ opacity: 0.55; }
+    12%{ opacity: 1; }
+    60%{ opacity: 0.75; }
+}
+
+@media (prefers-reduced-motion: reduce){
+    .page-loader__bolt, .page-loader__label{ animation: none; }
+}
+
+/* =========================================================
+   2. NAV — depth on scroll, smoother dropdown motion
+   ========================================================= */
+.site-nav{ box-shadow: 0 1px 0 var(--color-border-subtle); }
+.nav-kebab-menu{
+    box-shadow: var(--shadow-lg);
+    transform-origin: top right;
+    animation: menu-pop 0.15s ease;
+}
+@keyframes menu-pop{
+    from{ opacity: 0; transform: scale(0.96) translateY(-4px); }
+    to{ opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* =========================================================
+   3. BUTTONS — lift + glow on hover instead of a flat colour swap
+   ========================================================= */
+.btn-primary{ box-shadow: 0 2px 8px rgba(0, 168, 132, 0.25); }
+.btn-primary:hover{ transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0, 168, 132, 0.32); }
+.btn-primary:active{ transform: translateY(0); }
+.btn:disabled:hover{ transform: none; box-shadow: none; }
+
+/* =========================================================
+   4. CARDS — soften the default shadow into something with
+   more depth now that it's not competing for first-paint speed
+   ========================================================= */
+.card{ box-shadow: var(--shadow-lg); }
+
+/* =========================================================
+   5. TOASTS — slide/fade in
+   ========================================================= */
+.toast{ animation: toast-in 0.2s ease; }
+@keyframes toast-in{
+    from{ opacity: 0; transform: translateY(8px); }
+    to{ opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================
+   6. PAGE-LEAVE TRANSITION
+   -------------------------------------------------------
+   Shown briefly the moment the user navigates away, so the
+   destination page's own loader picks up seamlessly instead
+   of there being a blank/frozen moment on the OLD page while
+   the browser fetches the next one. See page_leave.html +
+   base_template.js showPageLeaveOverlay().
+   ========================================================= */
+.page-loader--leaving{ animation: leave-fade-in 0.18s ease both; }
+@keyframes leave-fade-in{
+    from{ opacity: 0; }
+    to{ opacity: 1; }
+}

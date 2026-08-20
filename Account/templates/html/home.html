@@ -1,0 +1,16 @@
+{% extends "reusables/base_template.html" %}
+
+{% block title %}Home{% endblock title %}
+{% block robots_content %}noindex, nofollow{% endblock robots_content %}
+{% comment %} Logged-in-only page — nothing here for a crawler to index. {% endcomment %}
+
+{% block body_content %}
+<div class="container" style="padding-block: var(--space-7); text-align:center;">
+    <h1>You're logged in{% if request.user.username %}, {{ request.user.username }}{% endif %}.</h1>
+    <p class="text-muted">The chat interface itself is out of scope, coming soon with proper whatsapp on open dashboard.</p>
+    <form method="post" action="{% url 'account_logout' %}" style="display:inline-block; margin-top: var(--space-4);">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-text">Log out</button>
+    </form>
+</div>
+{% endblock body_content %}

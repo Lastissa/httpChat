@@ -1,0 +1,54 @@
+/* =========================================================
+   heavy_css/auth.css
+   -------------------------------------------------------
+   Deferred decorative polish for signup/login/forgot-password.
+   Loaded after first paint — see reusables/page_open.html.
+   Deliberately avoids glassmorphism (frosted blur panels):
+   depth here comes from a gradient + soft radial glow + a
+   thin accent underline, which is lighter to render and
+   reads as more current than a blurred glass card.
+   ========================================================= */
+
+.auth-aside{
+    background: linear-gradient(160deg, var(--color-brand-primary-dark) 0%, var(--color-brand-primary) 100%);
+    
+}
+/* Soft radial glow in the corner — the one "modern" flourish,
+   kept subtle and cheap (a single gradient, no blur filter). */
+.auth-aside::before{
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37, 211, 102, 0.22) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.auth-aside__logo,
+.auth-aside h1,
+.auth-aside p,
+.auth-aside__list{  z-index: 1; }
+
+.auth-card__header h2{
+    
+    display: inline-block;
+}
+.auth-card__header h2::after{
+    content: '';
+    position: absolute;
+    left: 0; bottom: -4px;
+    width: 36px; height: 3px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-action-primary);
+}
+
+.username-check-btn:hover{ text-decoration: none; }
+
+.auth-tab{ transition: color var(--transition-fast), border-color var(--transition-fast); }
+
+@media (max-width: 900px){
+    /* No radial glow on the collapsed mobile hero strip — it has no
+       room to read as anything but visual clutter at that size. */
+    .auth-aside::before{ display: none; }
+}
