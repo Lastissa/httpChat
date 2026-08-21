@@ -10,5 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
             username: 'login-username-error',
             password: 'login-password-error',
         },
+        loadingLabel: 'In Progress…',
     });
 });

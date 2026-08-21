@@ -16,6 +16,7 @@ class StaticAccountViewSitemap(Sitemap):
     def items(self):
         # Each entry is (url_name, priority) — keeps per-page priority tunable without a second data structure.
         return [
+            ('landing', 1.0),
             ('account_signup', 0.9),
             ('account_login', 0.8),
             ('account_forgot_password', 0.3),

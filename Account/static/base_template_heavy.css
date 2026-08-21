@@ -91,6 +91,10 @@
 .btn-primary:active{ transform: translateY(0); }
 .btn:disabled:hover{ transform: none; box-shadow: none; }
 
+.btn__spinner{ animation: btn-spin 0.6s linear infinite; }
+@keyframes btn-spin{ to{ transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce){ .btn__spinner{ animation: none; } }
+
 /* =========================================================
    4. CARDS — soften the default shadow into something with
    more depth now that it's not competing for first-paint speed

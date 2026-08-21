@@ -28,10 +28,13 @@
 .auth-aside__logo,
 .auth-aside h1,
 .auth-aside p,
-.auth-aside__list{  z-index: 1; }
+.auth-aside__list{
+    position: relative; /* z-index below only applies to positioned elements */
+    z-index: 1;
+}
 
 .auth-card__header h2{
-    
+    position: relative; /* anchors the ::after underline to THIS element, not the nearest positioned ancestor */
     display: inline-block;
 }
 .auth-card__header h2::after{

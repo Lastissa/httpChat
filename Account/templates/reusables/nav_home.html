@@ -1,0 +1,28 @@
+{% extends "reusables/nav_shell.html" %}
+{% comment %}
+    nav_home.html
+    ---------------------------------------------------------
+    Example of a DIFFERENT nav built on the same shell as
+    nav.html — for logged-in areas (currently just the
+    placeholder home.html) where "Login" / "Sign Up" links
+    don't make sense anymore. Swap the link block contents
+    here as real logged-in nav destinations (chat, settings,
+    etc.) come online.
+    ---------------------------------------------------------
+{% endcomment %}
+
+{% block nav_brand_href %}{% url 'account_home' %}{% endblock nav_brand_href %}
+
+{% block nav_links_desktop %}
+<form method="post" action="{% url 'account_logout' %}" class="site-nav__link-form">
+    {% csrf_token %}
+    <button type="submit" class="site-nav__link site-nav__link--btn">Log out</button>
+</form>
+{% endblock nav_links_desktop %}
+
+{% block nav_links_mobile %}
+<form method="post" action="{% url 'account_logout' %}" class="site-nav__link-form" role="none">
+    {% csrf_token %}
+    <button type="submit" class="site-nav__link site-nav__link--btn" role="menuitem">Log out</button>
+</form>
+{% endblock nav_links_mobile %}

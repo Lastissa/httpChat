@@ -4,6 +4,8 @@
 {% block robots_content %}noindex, nofollow{% endblock robots_content %}
 {% comment %} Logged-in-only page — nothing here for a crawler to index. {% endcomment %}
 
+{% block nav %}{% include "reusables/nav_home.html" %}{% endblock nav %}
+
 {% block body_content %}
 <div class="container" style="padding-block: var(--space-7); text-align:center;">
     <h1>You're logged in{% if request.user.username %}, {{ request.user.username }}{% endif %}.</h1>

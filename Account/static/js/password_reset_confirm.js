@@ -10,5 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
             password: 'reset-password-error',
             password_confirm: 'reset-password-confirm-error',
         },
+        loadingLabel: 'Saving…',
     });
 });

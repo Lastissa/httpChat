@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
+    <link rel="icon" type="image/png" href="{% block favicon %}{% static 'img/httpchat_logo.png' %}{% endblock favicon %}">
     <title>{% block title %}{% endblock title %} | {{ project_name }}</title>
     <meta name="description" content="{% block extra_description %}{{ project_description }}{% endblock extra_description %}">
     <meta name="keywords" content="{% block keywords %}httpchat, chat app, online chat{% endblock keywords %}">
@@ -17,7 +17,7 @@
     <meta property="og:title" content="{% block og_title %}{{ project_name }}{% endblock og_title %}">
     <meta property="og:description" content="{% block og_description %}{{ project_description }}{% endblock og_description %}">
     <meta property="og:url" content="{{ project_base_url }}{% block og_url %}{% endblock og_url %}">
-    <meta property="og:image" content="{% block og_image %}{% static 'img/httpchat_logo.png' %}{% endblock og_image %}">
+    <meta property="og:image" content="{% block og_image %}{{ project_base_url }}{% static 'img/httpchat_logo.png' %}{% endblock og_image %}">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
@@ -25,7 +25,7 @@
     <meta name="twitter:description" content="{% block twitter_description %}{{ project_description }}{% endblock twitter_description %}">
 
     <meta name="theme-color" content="{% block theme_color %}#075E54{% endblock theme_color %}">
-    <link rel="icon" type="image/png" href="{% block favicon %}{% static 'img/httpchat_logo.png' %}{% endblock favicon %}">
+    <link rel="apple-touch-icon" href="{% block apple_touch_icon %}{% static 'img/apple-touch-icon.png' %}{% endblock apple_touch_icon %}">
     <!-- Light css -->
     <link rel="stylesheet" href="{% static 'base_template_light.css' %}">
     {% block extra_css_light %}{% endblock extra_css_light %}
@@ -37,17 +37,6 @@
         <link rel="stylesheet" href="{% static 'base_template_heavy.css' %}">
         {% block extra_css_heavy_noscript %}{% endblock extra_css_heavy_noscript %}
     </noscript>
-
-    {% comment %}
-        ============================= SEO / GEO: structured data =============================
-        Base JSON-LD (Organization + WebSite) present on every page — this is what lets
-        search engines show a proper site name/logo in results, and gives AI answer
-        engines (ChatGPT browsing, Perplexity, Google AI Overviews, etc. — "GEO", the
-        LLM-facing counterpart to SEO) an unambiguous, structured fact set to quote
-        instead of having to infer it from prose. Pages needing more (e.g. an
-        auth page describing itself) extend {% block structured_data_page %}.
-        ========================================================================================
-    {% endcomment %}
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",

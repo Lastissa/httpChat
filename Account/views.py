@@ -300,6 +300,19 @@ class AccountHome(LoginRequiredMixin, View):
         return render(request, 'html/home.html')
 
 
+class Landing(View):
+    """
+    Public landing page at the base domain ("/"). Minimal by design —
+    just enough to greet a first-time visitor and point them at Login
+    or Sign up. 
+    """
+
+    def get(self, request):
+        # if request.user.is_authenticated:
+        #     return redirect('account_home')
+        return render(request, 'html/landing.html')
+
+
 # =====================================================================
 # Forgot password — email tab
 # =====================================================================

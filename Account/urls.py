@@ -3,6 +3,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # --- Landing ---
+    path('', views.Landing.as_view(), name='landing'),
+
     # --- Sign up ---
     path('signup/', views.CreateAccount.as_view(), name='account_signup'),
     path('username/availability/', views.GenerateUsername.as_view(), name='username_availability'),

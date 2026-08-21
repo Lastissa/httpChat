@@ -214,7 +214,7 @@
         padding: var(--space-4) var(--space-4);
     }
     .auth-aside__logo{ width: 32px; height: 32px; margin-bottom: 0; }
-    .auth-aside h1{ font-size: var(--fs-lg); max-width: none; margin-bottom: 0; }
+    .auth-aside h1{ font-size: var(--fs-lg); max-width: none; margin-bottom: 0; min-width: 0; flex: 1 1 auto; }
     /* Full pitch copy + bullet list are pure "why sign up" marketing —
        useful on desktop where there's idle space, but on mobile they'd
        just push the actual form further down, so they're dropped

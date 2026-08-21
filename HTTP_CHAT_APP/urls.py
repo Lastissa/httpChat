@@ -3,7 +3,9 @@ from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.http import HttpResponse
 from django.urls import path, include, reverse
+from django.templatetags.static import static as static_url
 from django.views.decorators.cache import cache_control
+from django.views.generic.base import RedirectView
 
 from Account.sitemaps import StaticAccountViewSitemap
 from UTILITY.Static import static
@@ -19,6 +21,7 @@ def robots_txt(request):
     base = static.project_base_url.rstrip('/')
     lines = [
         'User-agent: *',
+        'Allow: /',
         'Allow: /login/',
         'Allow: /signup/',
         'Allow: /password/forgot/',
@@ -46,6 +49,7 @@ def llms_txt(request):
         'recovering a forgotten password via either an emailed reset link '
         'or a set of personal security questions.\n\n'
         '## Pages\n'
+        f'- Home: {static.project_base_url}\n'
         f'- Sign up: {static.project_base_url}signup/\n'
         f'- Log in: {static.project_base_url}login/\n'
         f'- Forgot password: {static.project_base_url}password/forgot/\n'
@@ -60,6 +64,11 @@ urlpatterns = [
     path('robots.txt', robots_txt, name='robots_txt'),
     path('llms.txt', llms_txt, name='llms_txt'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+
+    # Browsers/crawlers request this at the domain root by default,
+    # independent of the <link rel="icon"> tags in <head> — without
+    # this it 404s even though the icon renders fine everywhere else.
+    path('favicon.ico', RedirectView.as_view(url=static_url('img/httpchat_logo.png'), permanent=True), name='brand_logo'),
 
     path('', include('Account.urls')),  #   On update, remember to update the canonicals in each pages
 ]

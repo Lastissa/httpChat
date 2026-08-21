@@ -419,6 +419,51 @@ const HttpChat = (() => {
     }
 
     /**
+     * Puts a submit button into (or out of) an in-progress state: a
+     * spinner, `aria-busy`, and (optionally) a swapped label — e.g.
+     * "Log in" -> "Logging in…". This is the ONLY feedback a user gets
+     * that their click registered; `disabled` + the OS not-allowed
+     * cursor alone is invisible on mobile (no cursor) and easy to miss
+     * on desktop (only shows while actively hovering the button).
+     */
+    function setButtonLoading(btn, isLoading, loadingLabel) {
+        if (!btn) return;
+
+        if (isLoading) {
+            let label = btn.querySelector('.btn__label');
+            if (!label) {
+                label = document.createElement('span');
+                label.className = 'btn__label';
+                label.textContent = btn.textContent.trim();
+                btn.textContent = '';
+                btn.appendChild(label);
+            }
+            if (!btn.dataset.originalLabel) btn.dataset.originalLabel = label.textContent;
+            if (!btn.querySelector('.btn__spinner')) {
+                const spinner = document.createElement('span');
+                spinner.className = 'btn__spinner';
+                spinner.setAttribute('aria-hidden', 'true');
+                btn.insertBefore(spinner, label);
+            }
+            if (loadingLabel) label.textContent = loadingLabel;
+
+            btn.disabled = true;
+            btn.classList.add('is-loading');
+            btn.setAttribute('aria-busy', 'true');
+        } else {
+            btn.disabled = false;
+            btn.classList.remove('is-loading');
+            btn.removeAttribute('aria-busy');
+
+            const spinner = btn.querySelector('.btn__spinner');
+            if (spinner) spinner.remove();
+            const label = btn.querySelector('.btn__label');
+            if (label && btn.dataset.originalLabel) label.textContent = btn.dataset.originalLabel;
+            delete btn.dataset.originalLabel;
+        }
+    }
+
+    /**
      * @param {HTMLFormElement} form
      * @param {Object} opts
      * @param {Object.<string,string>} opts.errorElementIds - maps a
@@ -429,7 +474,7 @@ const HttpChat = (() => {
      * @param {function} [opts.beforeSubmit] - return false to abort.
      */
     function submitFormAsJson(form, opts) {
-        const { errorElementIds, onSuccess, beforeSubmit } = opts;
+        const { errorElementIds, onSuccess, beforeSubmit, loadingLabel } = opts;
 
         form.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -443,7 +488,14 @@ const HttpChat = (() => {
             });
 
             const submitBtn = form.querySelector('[type="submit"]');
-            if (submitBtn) submitBtn.disabled = true;
+            setButtonLoading(submitBtn, true, loadingLabel);
+
+            // Set when we hand off to a real page navigation (leavePage),
+            // so .finally() below knows to leave the button in its
+            // loading/disabled state through the redirect instead of
+            // briefly re-enabling it (and inviting a second click) in
+            // the ~120ms window before the browser actually navigates.
+            let navigatingAway = false;
 
             const payload = {};
             new FormData(form).forEach((value, key) => { payload[key] = value; });
@@ -475,6 +527,7 @@ const HttpChat = (() => {
                         if (typeof onSuccess === 'function') {
                             onSuccess(data);
                         } else if (data.redirect) {
+                            navigatingAway = true;
                             leavePage(data.redirect);
                         }
                         return;
@@ -489,7 +542,7 @@ const HttpChat = (() => {
                     showToast('Could not reach the server, please try again.', 'error');
                 })
                 .finally(() => {
-                    if (submitBtn) submitBtn.disabled = false;
+                    if (!navigatingAway) setButtonLoading(submitBtn, false);
                 });
         });
     }

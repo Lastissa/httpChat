@@ -1,0 +1,30 @@
+{% extends "reusables/base_template.html" %}
+
+{% block title %}Chat by username, no phone number needed{% endblock title %}
+{% block canonical %}{% endblock canonical %}
+{% block extra_description %}{{ project_description }} Create a free account and start chatting by username in seconds.{% endblock extra_description %}
+{% block og_title %}{{ project_name }}{% endblock og_title %}
+{% block og_description %}{{ project_description }}{% endblock og_description %}
+{% block og_url %}{% endblock og_url %}
+
+{% block structured_data_page %}
+<script type="application/ld+json">
+{
+    "@type": "WebPage",
+    "name": "{{ project_name }}",
+    "description": "{{ project_description }}",
+    "isPartOf": { "@type": "WebSite", "name": "{{ project_name }}", "url": "{{ project_base_url }}" }
+}
+</script>
+{% endblock structured_data_page %}
+
+{% block body_content %}
+<div class="container" style="padding-block: var(--space-7); text-align:center;">
+    <h1>{{ project_name.upper }}</h1>
+    <p class="text-muted">{{ project_description }}</p>
+    <div style="display:inline-flex; gap: var(--space-3); margin-top: var(--space-4);">
+        <a href="{% url 'account_signup' %}" class="btn btn-primary">Sign up</a>
+        <a href="{% url 'account_login' %}" class="btn btn-text">Log in</a>
+    </div>
+</div>
+{% endblock body_content %}
