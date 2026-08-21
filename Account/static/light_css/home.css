@@ -1,0 +1,142 @@
+/* =========================================================
+   light_css/home.css
+   -------------------------------------------------------
+   STRUCTURAL styling for the logged-in home shell: the chat
+   list screen (current default tab) plus the bottom nav that
+   switches between Chats / Status / Feed / Video.
+
+   Loaded synchronously (critical) because the bottom nav's
+   fixed position and height reserve real layout space — if
+   this arrived late, page content would jump upward the
+   moment it loads. Decorative shadow/hover/motion for these
+   same elements lives in heavy_css/home.css instead.
+
+   Status / Feed / Video are placeholder destinations only
+   (see AGENT.MD + task scope) — no views/URLs exist for them
+   yet, so their nav links use "#" rather than {% url %}.
+   ========================================================= */
+
+/* Height of the fixed bottom nav, kept as its own token (not
+   in base_template_light.css) because it's specific to this
+   page's shell, not a site-wide constant. Includes the iOS
+   safe-area inset so the nav clears the home-indicator strip
+   on notched phones instead of sitting under it. */
+:root{
+    --bottom-nav-height: 60px;
+}
+
+/* =========================== Page shell =========================== */
+.chat-home{
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - var(--nav-height));
+    /* Reserve space so fixed .bottom-nav never covers the last
+       message/CTA in the content above it. */
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+}
+
+/* =========================== In-page header =========================== */
+/* Sits below the persistent site-nav; holds the screen title and the
+   (currently non-functional — no search backend yet) search field. */
+.chat-home__header{
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4);
+}
+.chat-home__title{ margin: 0; font-size: var(--fs-xl); }
+
+.chat-search{
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.chat-search__icon{
+    position: absolute;
+    left: var(--space-3);
+    width: 18px;
+    height: 18px;
+    color: var(--color-text-muted);
+    pointer-events: none;
+}
+.chat-search__input{ padding-left: calc(var(--space-3) * 2 + 18px); }
+
+/* =========================== Empty state =========================== */
+/* Shown in place of the chat list until real conversations exist.
+   Centered in the remaining space below the header. */
+.chat-empty{
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: var(--space-3);
+    padding: var(--space-6) var(--space-4);
+}
+.chat-empty__icon{
+    width: 64px;
+    height: 64px;
+    color: var(--color-text-muted);
+}
+.chat-empty__title{ margin: 0; font-size: var(--fs-lg); }
+.chat-empty__text{
+    margin: 0;
+    max-width: 32ch;
+    color: var(--color-text-muted);
+    font-size: var(--fs-sm);
+}
+
+/* =========================== Floating "new chat" action =========================== */
+.chat-fab{
+    position: fixed;
+    right: var(--space-5);
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + var(--space-4));
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-action-primary);
+    color: var(--color-text-on-brand);
+    z-index: 400;
+}
+.chat-fab:hover{ text-decoration: none; background-color: var(--color-action-primary-hover); }
+.chat-fab svg{ width: 24px; height: 24px; }
+
+/* =========================== Bottom nav =========================== */
+.bottom-nav{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 500;
+    height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background-color: var(--color-surface-card);
+    border-top: 1px solid var(--color-border-subtle);
+}
+.bottom-nav__inner{
+    display: flex;
+    height: var(--bottom-nav-height);
+    max-width: 1100px;
+    margin-inline: auto;
+}
+.bottom-nav__item{
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+.bottom-nav__item:hover{ color: var(--color-text-primary); text-decoration: none; }
+.bottom-nav__item svg{ width: 22px; height: 22px; }
+
+/* Current tab (Chats, per task scope). aria-current="page" is the
+   semantic signal; the colour swap is just its visual expression. */
+.bottom-nav__item[aria-current="page"]{ color: var(--color-action-primary); }

@@ -14,6 +14,14 @@
 {% block nav_brand_href %}{% url 'account_home' %}{% endblock nav_brand_href %}
 
 {% block nav_links_desktop %}
+{% comment %}
+    New group / Starred / Settings have no view yet, so they use "#"
+    instead of {% url %} for now (would 500 otherwise) — swap in real
+    named URLs once those pages exist.
+{% endcomment %}
+<a href="#" class="site-nav__link">New group</a>
+<a href="#" class="site-nav__link">Starred</a>
+<a href="#" class="site-nav__link">Settings</a>
 <form method="post" action="{% url 'account_logout' %}" class="site-nav__link-form">
     {% csrf_token %}
     <button type="submit" class="site-nav__link site-nav__link--btn">Log out</button>
@@ -21,6 +29,9 @@
 {% endblock nav_links_desktop %}
 
 {% block nav_links_mobile %}
+<a href="#" class="site-nav__link" role="menuitem">New group</a>
+<a href="#" class="site-nav__link" role="menuitem">Starred</a>
+<a href="#" class="site-nav__link" role="menuitem">Settings</a>
 <form method="post" action="{% url 'account_logout' %}" class="site-nav__link-form" role="none">
     {% csrf_token %}
     <button type="submit" class="site-nav__link site-nav__link--btn" role="menuitem">Log out</button>

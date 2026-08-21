@@ -1,0 +1,17 @@
+/* =========================================================
+   heavy_css/home.css
+   -------------------------------------------------------
+   NON-CRITICAL polish for the home shell: shadow/depth and
+   hover motion only. Structure lives in light_css/home.css.
+   ========================================================= */
+
+.bottom-nav{ box-shadow: var(--shadow-md); }
+
+.bottom-nav__item{ transition: color var(--transition-fast); }
+
+.chat-fab{
+    box-shadow: var(--shadow-lg);
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+.chat-fab:hover{ transform: translateY(-1px); }
+.chat-fab:active{ transform: translateY(0); }

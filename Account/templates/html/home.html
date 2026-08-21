@@ -1,18 +1,98 @@
 {% extends "reusables/base_template.html" %}
+{% load static %}
 
-{% block title %}Home{% endblock title %}
+{% block title %}Chats{% endblock title %}
 {% block robots_content %}noindex, nofollow{% endblock robots_content %}
 {% comment %} Logged-in-only page — nothing here for a crawler to index. {% endcomment %}
 
 {% block nav %}{% include "reusables/nav_home.html" %}{% endblock nav %}
 
+{% block extra_css_light %}<link rel="stylesheet" href="{% static 'light_css/home.css' %}">{% endblock extra_css_light %}
+{% block extra_css_heavy %}<link rel="stylesheet" href="{% static 'heavy_css/home.css' %}" media="print" onload="this.media='all'">{% endblock extra_css_heavy %}
+{% block extra_css_heavy_noscript %}<link rel="stylesheet" href="{% static 'heavy_css/home.css' %}">{% endblock extra_css_heavy_noscript %}
+
+{% comment %}
+    home.html — logged-in landing screen.
+    ---------------------------------------------------------
+    UI-only scope: this page has no chat/story/feed/video data
+    or backend yet (see AGENT.MD + task notes), so it renders
+    structure only —  a WhatsApp-style "Chats" screen (the
+    current/default tab) in its empty state, plus the bottom
+    nav that will eventually switch between Chats / Status /
+    Feed / Video. Those three other destinations, and the
+    "new chat" action, have no view/URL yet, so they use "#"
+    placeholders rather than a Django url tag — swap those in
+    once the real routes exist. Nothing here is wired to JS;
+    per task scope the bottom nav is a static (non-switching)
+    shell for now.
+{% endcomment %}
+
 {% block body_content %}
-<div class="container" style="padding-block: var(--space-7); text-align:center;">
-    <h1>You're logged in{% if request.user.username %}, {{ request.user.username }}{% endif %}.</h1>
-    <p class="text-muted">The chat interface itself is out of scope, coming soon with proper whatsapp on open dashboard.</p>
-    <form method="post" action="{% url 'account_logout' %}" style="display:inline-block; margin-top: var(--space-4);">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-text">Log out</button>
-    </form>
+<div class="chat-home">
+
+    <header class="chat-home__header">
+        <h1 class="chat-home__title">Chats</h1>
+        <div class="chat-search">
+            <svg class="chat-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input class="field-input chat-search__input" type="search" placeholder="Search chats" aria-label="Search chats">
+        </div>
+    </header>
+
+    <!-- Empty state: no conversations exist yet (no chat backend/data in scope). -->
+    <div class="chat-empty">
+        <svg class="chat-empty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4.5V16H6.5A2.5 2.5 0 0 1 4 13.5v-8Z"></path>
+        </svg>
+        <h2 class="chat-empty__title">No chats yet</h2>
+        <p class="chat-empty__text">Start a conversation to see it appear here.</p>
+        <a href="#" class="btn btn-primary">Start a new chat</a>
+    </div>
+
+    <!-- Floating "new chat" action, WhatsApp-style. Placeholder target — no compose view yet. -->
+    <a href="#" class="chat-fab" aria-label="Start new chat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+    </a>
+
+    <!-- Bottom nav: Chats (current) / Status / Feed / Video.
+         Status, Feed and Video have no view/URL yet, hence "#". -->
+    <nav class="bottom-nav" aria-label="Home sections">
+        <div class="bottom-nav__inner">
+            <a href="#" class="bottom-nav__item" aria-current="page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4.5V16H6.5A2.5 2.5 0 0 1 4 13.5v-8Z"></path>
+                </svg>
+                <span>Chats</span>
+            </a>
+            <a href="#" class="bottom-nav__item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span>Status</span>
+            </a>
+            <a href="#" class="bottom-nav__item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="5" rx="1"></rect>
+                    <rect x="3" y="11" width="18" height="5" rx="1"></rect>
+                    <rect x="3" y="18" width="10" height="3" rx="1"></rect>
+                </svg>
+                <span>Feed</span>
+            </a>
+            <a href="#" class="bottom-nav__item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="4"></rect>
+                    <path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor" stroke="none"></path>
+                </svg>
+                <span>Video</span>
+            </a>
+        </div>
+    </nav>
+
 </div>
 {% endblock body_content %}

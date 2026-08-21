@@ -164,7 +164,7 @@ class GenerateUsername(View):
     """Check username availability and suggest alternatives if taken.."""
 
     def post(self, request):
-        if _rate_limited("username-check", request, limit=2, window_seconds=5):
+        if _rate_limited("username-check", request, limit=10, window_seconds=5):
             return JsonResponse(
                 {'available': False, 'rate_limited': True, 'message': 'Too many attempts. Please wait for 5 seconds.'},
                 status=429,
