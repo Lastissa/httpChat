@@ -30,14 +30,31 @@
 {% block body_content %}
 <div class="chat-home">
 
+     {% comment %} No "Chats" heading here on purpose: the persistent site-nav
+         already carries the project_name brand, and the bottom
+         nav's "Chats" label already identifies this screen — a third,
+         page-level title just repeated that for no reason. Sticky
+         (not static) so it stays pinned under the site-nav while the
+         list scrolls beneath it, matching the WhatsApp behaviour this
+         screen is modelled on.  {% endcomment %}
     <header class="chat-home__header">
-        <h1 class="chat-home__title">Chats</h1>
         <div class="chat-search">
             <svg class="chat-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <circle cx="11" cy="11" r="7"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             <input class="field-input chat-search__input" type="search" placeholder="Search chats" aria-label="Search chats">
+        </div>
+
+        {% comment %} Filter chips, WhatsApp-style. Visual/structural only for
+             now: with no chat data or backend yet (see AGENT.MD +
+             task scope), there is nothing to actually filter, so
+             these don't carry click behaviour — same "static shell"
+             reasoning already applied to the bottom nav below.  {% endcomment %}
+        <div class="chat-filters" role="tablist" aria-label="Filter chats">
+            <button type="button" class="chat-filter" role="tab" aria-selected="true">All</button>
+            <button type="button" class="chat-filter" role="tab" aria-selected="false">Favourites</button>
+            <button type="button" class="chat-filter" role="tab" aria-selected="false">Groups</button>
         </div>
     </header>
 

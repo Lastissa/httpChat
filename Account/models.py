@@ -71,7 +71,7 @@ class Profile(models.Model):
     secret_answer = models.CharField(max_length=150)
 
     def __str__(self):
-        return f"Profile for {self.user.eusername}"
+        return f"Profile for {self.user.username}"
 
 class SecurityAnswerSet(models.Model):
     """

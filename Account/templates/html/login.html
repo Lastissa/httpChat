@@ -79,7 +79,11 @@
                         </button>
                     </div>
                     <span class="field-error" id="login-password-error" role="alert"></span>
-                    <p class="field-hint"><a href="{% url 'account_forgot_password' %}">Forgot your password?</a></p>
+                    <p class="field-hint">
+                        <a href="{% url 'account_forgot_password' %}">Forgot your password?</a>
+                        &nbsp;&middot;&nbsp;
+                        <a href="{% url 'account_forgot_username' %}">Forgot your username?</a>
+                    </p>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-block">Log in</button>

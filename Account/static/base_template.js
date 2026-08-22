@@ -561,6 +561,42 @@ const HttpChat = (() => {
     }
 
     /* =========================================================
+       Server-rendered (Django) messages -> toasts
+       ---------------------------------------------------------
+       Django's messages framework (see base_template.html's
+       "{% if messages %}" block) used to render as a plain,
+       full-width banner glued under the nav on the next full
+       page load (e.g. the "Welcome back, <user>." message after
+       login redirects to /home/). That looked like a server
+       error banner, not part of the app UI, and — unlike every
+       other notification in the app — never auto-dismissed.
+       This folds those same messages into the existing toast
+       system instead, so there is exactly ONE notification
+       style everywhere, then removes the now-empty banner
+       markup so nothing is shown twice. Read once on load;
+       Django only ever renders this block on the page that
+       consumes the message (messages are one-shot server-side),
+       so there is nothing left to convert on next load.
+       ========================================================= */
+    function initServerMessages() {
+        const container = document.querySelector('.site-messages');
+        if (!container) return;
+
+        container.querySelectorAll('.alert').forEach((el) => {
+            let type = 'default';
+            if (el.classList.contains('alert-success')) type = 'success';
+            else if (el.classList.contains('alert-error')) type = 'error';
+            // alert-warning/alert-info fall back to the neutral toast
+            // style — there's no toast-warning/-info variant, and a
+            // second visual tier isn't worth the added CSS for how
+            // rarely those tags are actually used.
+            showToast(el.textContent.trim(), type);
+        });
+
+        container.remove();
+    }
+
+    /* =========================================================
        Init
        ========================================================= */
 
@@ -577,6 +613,7 @@ const HttpChat = (() => {
         initThemeToggle();
         initNavKebab();
         initPageLeaveOnLinks();
+        initServerMessages();
     }
 
     document.addEventListener('DOMContentLoaded', init);

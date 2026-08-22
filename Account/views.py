@@ -25,7 +25,7 @@ from django.urls import reverse
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from UTILITY.Static import security_questions
+from UTILITY.Static import security_questions, static
 from UTILITY.abstraction import _parse_json_body, _rate_limited
 from .models import PasswordResetToken, SecurityAnswerSet
 
@@ -507,6 +507,146 @@ class PasswordResetConfirm(View):
 
         messages.success(request, 'Your password has been reset. Please log in.')
         return JsonResponse({'success': True, 'redirect': reverse('account_login')})
+
+
+# =====================================================================
+# Forgot username
+# =====================================================================
+# Mirrors the forgot-password flow's two-tab shape (email / security
+# question) — same reasoning, same anti-enumeration + session-linking
+# precautions, but with two differences forced by what's actually
+# being recovered:
+#   1. There's no "set a new value" step at the end. Password reset
+#      hands off to PasswordResetConfirm; here, success just means
+#      returning the username itself in the response.
+#   2. The security-question tab's identifier is EMAIL ONLY, not
+#      "username or email" — a user going through this flow doesn't
+#      have their username to type in the first place.
+# =====================================================================
+
+class ForgotUsername(View):
+    """Renders the forgot-username page with its two tabs."""
+
+    def get(self, request):
+        return render(request, 'html/forgot_username.html')
+
+
+class ForgotUsernameEmailRequest(View):
+    """
+    POST: user submits an email address. If an account exists for it,
+    email them their username. Generic response either way — same
+    anti-enumeration reasoning as ForgotPasswordEmailRequest.
+    """
+
+    GENERIC_MESSAGE = "If an account exists for that email, we've sent the username for it."
+
+    def post(self, request):
+        if _rate_limited('username_recovery_email', request, limit=5, window_seconds=60):
+            return JsonResponse({'message': 'Too many attempts. Please wait a minute and try again.'}, status=429)
+
+        data, error_response = _parse_json_body(request)
+        if error_response:
+            return error_response
+
+        email = (data.get('email') or '').strip()
+        try:
+            email_validator(email)
+        except ValidationError:
+            return JsonResponse({'fieldErrors': {'email': 'Enter a valid email address.'}}, status=400)
+
+        user = User.objects.filter(email__iexact=email, is_active=True).first()
+        if user:
+            send_mail(
+                subject=f'Your {static.project_name} username',
+                message=f'Your username is: {user.username}',
+                from_email=None,  # falls back to DEFAULT_FROM_EMAIL
+                recipient_list=[email],
+            )
+
+        return JsonResponse({'success': True, 'message': self.GENERIC_MESSAGE})
+
+
+USERNAME_RECOVERY_SESSION_KEY = 'username_recovery_candidate_user_id'  # deliberately its own key, separate from SECURITY_RESET_SESSION_KEY, so a half-finished password reset can't be reused to finish a username lookup or vice versa
+
+
+class ForgotUsernameSecurityLookup(View):
+    """
+    Step 1; look up the account by EMAIL (not "username or email" —
+    see module note above) and, if it has a saved SecurityAnswerSet,
+    return that set's question text. put the candidate user's id
+    in the session, same pattern as ForgotPasswordSecurityLookup.
+    """
+
+    def post(self, request):
+        if _rate_limited('username_recovery_sq_lookup', request, limit=8, window_seconds=60):
+            return JsonResponse({'message': 'Too many attempts. Please wait a minute and try again.'}, status=429)
+
+        data, error_response = _parse_json_body(request)
+        if error_response:
+            return error_response
+
+        email = (data.get('identifier') or '').strip()
+        if not email:
+            return JsonResponse({'fieldErrors': {'identifier': 'Enter your email.'}}, status=400)
+
+        user = User.objects.filter(email__iexact=email).first()
+
+        answer_set = SecurityAnswerSet.objects.filter(user=user).first() if user else None
+        if not answer_set:
+            return JsonResponse(
+                {'fieldErrors': {'identifier': 'No account with security questions was found for this email.'}},
+                status=400,
+            )
+
+        request.session[USERNAME_RECOVERY_SESSION_KEY] = user.pk
+        request.session.set_expiry(600)  # 10 minutes to finish the flow
+
+        questions = [q.strip() for q in security_questions[answer_set.question_set_index].split(',') if q.strip()]
+        return JsonResponse({'success': True, 'questions': questions})
+
+
+class ForgotUsernameSecurityVerify(View):
+    """
+    Step 2: verify answers. Unlike the password flow, there's nothing
+    to hand off to afterwards, so a correct answer set returns the
+    username directly in this response instead of a redirect.
+    """
+
+    def post(self, request):
+        if _rate_limited('username_recovery_sq_verify', request, limit=8, window_seconds=60):
+            return JsonResponse({'message': 'Too many attempts. Please wait a minute and try again.'}, status=429)
+
+        user_id = request.session.get(USERNAME_RECOVERY_SESSION_KEY)
+        if not user_id:
+            return JsonResponse(
+                {'message': 'Your session expired. Please start over.'},
+                status=400,
+            )
+
+        data, error_response = _parse_json_body(request)
+        if error_response:
+            return error_response
+
+        answer_set = SecurityAnswerSet.objects.filter(user_id=user_id).first()
+        if not answer_set:
+            return JsonResponse({'message': 'Its Almost Impossible for this to happen to a real user. Contact support'}, status=400)
+
+        submitted = [
+            (data.get('answer_1') or '').strip(),
+            (data.get('answer_2') or '').strip(),
+            (data.get('answer_3') or '').strip(),
+        ]
+        stored_hashes = [answer_set.answer_1_hash, answer_set.answer_2_hash, answer_set.answer_3_hash]
+
+        all_correct = all(_check_answer(incoming, stored) for incoming, stored in zip(submitted, stored_hashes))
+        if not all_correct:
+            return JsonResponse(
+                {'fieldErrors': {'answer_1': 'One or more answers are incorrect.'}},
+                status=400,
+            )
+
+        del request.session[USERNAME_RECOVERY_SESSION_KEY]
+        return JsonResponse({'success': True, 'username': answer_set.user.username})
 
 
 # =====================================================================

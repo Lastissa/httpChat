@@ -2,7 +2,7 @@ from django.conf import settings
 
 class Static:
     project_name = 'httpchat'
-    project_description= 'HttpChat is a chat app using http to connect users.'
+    project_description= 'HttpChat is a chat app using http to connect users with coming features like streaming videos , text feeds and stories mode.'
     project_base_url = settings.PROJECT_BASE_URL or "http://localhost:8000/"
     
     

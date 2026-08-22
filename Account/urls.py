@@ -21,6 +21,12 @@ urlpatterns = [
     path('password/forgot/security/lookup/', views.ForgotPasswordSecurityLookup.as_view(), name='account_forgot_password_security_lookup'),
     path('password/forgot/security/verify/', views.ForgotPasswordSecurityVerify.as_view(), name='account_forgot_password_security_verify'),
     path('password/reset/<str:token>/', views.PasswordResetConfirm.as_view(), name='account_password_reset_confirm'),
+
+    # --- Forgot username ---
+    path('username/forgot/', views.ForgotUsername.as_view(), name='account_forgot_username'),
+    path('username/forgot/email/', views.ForgotUsernameEmailRequest.as_view(), name='account_forgot_username_email'),
+    path('username/forgot/security/lookup/', views.ForgotUsernameSecurityLookup.as_view(), name='account_forgot_username_security_lookup'),
+    path('username/forgot/security/verify/', views.ForgotUsernameSecurityVerify.as_view(), name='account_forgot_username_security_verify'),
 ]
 
 

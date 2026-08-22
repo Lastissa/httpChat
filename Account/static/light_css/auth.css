@@ -196,6 +196,19 @@
 }
 .auth-tab-panel[hidden]{ display: none; }
 
+/* ---------------- Username reveal (forgot-username, security-question step 3) ---------------- */
+.username-reveal{ text-align: center; }
+.username-reveal__value{
+    font-size: var(--fs-xl);
+    font-weight: 700;
+    color: var(--color-action-primary);
+    background-color: var(--color-surface-page);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    margin: 0 0 var(--space-4);
+    word-break: break-all;
+}
+
 /* ---------------- Responsive ----------------
    the aside COLLAPSES into a compact horizontal hero strip:
    logo + one line of copy, not the full pitch + bullet list.
@@ -208,6 +221,16 @@
         position: static;
         height: auto;
         flex: 0 0 auto;
+        /* Reset the desktop rule's `align-self: flex-start` (used
+           there so the sticky aside doesn't stretch to the sibling
+           column's full scroll height). Left in place, it also
+           applies on mobile — where .auth-screen's main axis is
+           now vertical — and makes .auth-aside size to its content
+           (shrink-to-fit) on the CROSS axis instead of stretching
+           to the full viewport width. That's the actual cause of
+           the heading/text not reaching the screen edge on mobile;
+           `stretch` restores normal full-width behaviour. */
+        align-self: stretch;
         flex-direction: row;
         align-items: center;
         gap: var(--space-3);

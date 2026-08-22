@@ -13,3 +13,4 @@ Only files modified shoul be retunred
 * Bloated pages are prohibited as every line of code must have a task it is asiinged to and well commented so knowing the ttradeoff of removing it
 * UPDATE THE AI_WORKFLOW ON EVERY SINGLE REFACTOR,EDIT, OR ANY CHNGES MADE TO THS PROJECT
 * Securoty is important, do not expose any critical security breach 
+* You are forbidden from running migration or makemigrations, leavethat for me to always handle
